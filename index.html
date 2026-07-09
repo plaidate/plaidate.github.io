@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plAIdate — AI-built 1-bit games &amp; engines for Playdate</title>
+<style>
+  :root{
+    --yellow:#ffc633; --ink:#141210; --cream:#fffdf5;
+    --ground:var(--yellow); --panel:var(--cream); --edge:var(--ink);
+    --text:var(--ink); --dim:#5c574a; --screen:#12100c;
+    --card-bg:var(--cream); --card-ink:var(--ink);
+    --inv-bg:var(--ink); --inv-ink:var(--yellow);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#141210; --panel:#1e1a12; --edge:#3a3324;
+      --text:#f3ecdb; --dim:#9c927a; --screen:#0c0b08;
+      --card-bg:#1e1a12; --card-ink:#f3ecdb;
+      --inv-bg:var(--yellow); --inv-ink:#141210;
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#ffc633; --panel:#fffdf5; --edge:#141210;
+    --text:#141210; --dim:#5c574a; --screen:#12100c;
+    --card-bg:#fffdf5; --card-ink:#141210;
+    --inv-bg:#141210; --inv-ink:#ffc633;
+  }
+  :root[data-theme="dark"]{
+    --ground:#141210; --panel:#1e1a12; --edge:#3a3324;
+    --text:#f3ecdb; --dim:#9c927a; --screen:#0c0b08;
+    --card-bg:#1e1a12; --card-ink:#f3ecdb;
+    --inv-bg:#ffc633; --inv-ink:#141210;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--ground);color:var(--text);
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px 96px}
+
+  /* masthead */
+  header{padding:60px 0 30px}
+  .bar{height:10px;background:var(--edge);
+    background-image:repeating-linear-gradient(90deg,var(--edge) 0 6px,transparent 6px 12px);
+    background-size:12px 10px;background-repeat:repeat-x;margin-bottom:26px;
+    /* fallback solid + dotted overlay for the 1-bit feel */
+  }
+  h1{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:clamp(40px,9vw,84px);line-height:.95;margin:0;font-weight:700;
+    letter-spacing:-.03em;text-transform:lowercase;}
+  h1 .ai{text-transform:uppercase;background:var(--inv-bg);color:var(--inv-ink);
+    padding:0 .07em;border-radius:8px;-webkit-text-stroke:0;}
+  h1 .crank{color:var(--yellow);-webkit-text-stroke:2px var(--edge);}
+  @media (prefers-color-scheme:dark){ h1 .crank{-webkit-text-stroke:0;} }
+  :root[data-theme="dark"] h1 .crank{-webkit-text-stroke:0;}
+  :root[data-theme="light"] h1 .crank{-webkit-text-stroke:2px var(--edge);}
+  .tag{font-size:clamp(15px,2.3vw,20px);margin:16px 0 0;max-width:56ch;color:var(--text)}
+  .tag a{font-weight:600;text-decoration:none;border-bottom:2px solid currentColor}
+  .meta{margin-top:22px;display:flex;gap:10px 14px;flex-wrap:wrap;align-items:center;
+    font-size:12.5px;letter-spacing:.06em;text-transform:uppercase}
+  .chip{border:2px solid var(--edge);padding:5px 11px;border-radius:2px;text-decoration:none;
+    background:transparent;color:var(--text)}
+  .chip:hover{background:var(--inv-bg);color:var(--inv-ink);border-color:var(--inv-bg)}
+  .chip.count{background:var(--edge);color:var(--ground);border-color:var(--edge)}
+
+  /* sections */
+  h2{font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;
+    margin:56px 0 4px;font-weight:700;display:flex;align-items:baseline;gap:10px}
+  h2 .n{border:2px solid var(--edge);border-radius:2px;padding:1px 7px;font-size:11px;
+    font-variant-numeric:tabular-nums}
+  .sub{color:var(--dim);font-size:14px;margin:0 0 22px;max-width:60ch}
+
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:16px}
+  .card{background:var(--card-bg);color:var(--card-ink);border:2px solid var(--edge);
+    border-radius:4px;overflow:hidden;display:flex;flex-direction:column;
+    transition:background .12s,color .12s;}
+  .card:hover,.card:focus-within{background:var(--inv-bg);color:var(--inv-ink)}
+  .card:hover .desc,.card:focus-within .desc{color:var(--inv-ink);opacity:.8}
+  .card:hover .name,.card:focus-within .name{color:var(--inv-ink)}
+  .card:hover .chip2,.card:focus-within .chip2{border-color:var(--inv-ink);color:var(--inv-ink)}
+  .card:hover .chip2.get,.card:focus-within .chip2.get{background:var(--inv-ink);color:var(--inv-bg)}
+  .cover{aspect-ratio:63/50;width:100%;object-fit:cover;display:block;
+    background:var(--screen);border-bottom:2px solid var(--edge);
+    image-rendering:pixelated}
+  .body{padding:15px 16px 16px;display:flex;flex-direction:column;gap:9px;flex:1}
+  .name{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    font-weight:700;font-size:18px;text-decoration:none;letter-spacing:-.01em;color:var(--card-ink)}
+  .desc{color:var(--dim);font-size:13.5px;line-height:1.5;flex:1}
+  .links{display:flex;gap:8px;margin-top:2px}
+  .chip2{font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+    padding:4px 10px;border-radius:2px;border:2px solid var(--edge);color:var(--card-ink);
+    white-space:nowrap;font-family:ui-monospace,Menlo,monospace}
+  .chip2.get{background:var(--edge);color:var(--card-bg);border-color:var(--edge);font-weight:700}
+  a:focus-visible,.card:focus-within{outline:3px solid var(--yellow);outline-offset:2px}
+
+  footer{margin-top:72px;border-top:2px solid var(--edge);padding-top:22px;
+    color:var(--dim);font-size:13px;max-width:70ch}
+  footer code{font-family:ui-monospace,Menlo,monospace;color:var(--text)}
+  footer a{color:var(--text);text-decoration:none;border-bottom:2px solid currentColor}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="bar" aria-hidden="true"></div>
+    <h1>pl<span class="ai">AI</span>date<span class="crank">.</span></h1>
+    <p class="tag">Original 1-bit games, ports, and engines for the
+      <a href="https://play.date/">Panic&nbsp;Playdate</a> — every project built
+      with the help of AI (that's the <b>AI</b> in&nbsp;plAIdate). Crank-native,
+      with procedural art and all-synthesized&nbsp;audio.</p>
+    <nav class="meta mono">
+      <span class="chip count" id="count">26 repos</span>
+      <a class="chip" href="https://github.com/plaidate">GitHub org →</a>
+      <a class="chip" href="https://play.date/account/sideload/">How to sideload →</a>
+    </nav>
+  </header>
+
+  <main id="sections"></main>
+
+  <footer>
+    Prebuilt games ship as <code>.pdx.zip</code> on each repo's Releases page —
+    download and <a href="https://play.date/account/sideload/">sideload</a> to a
+    device, or unzip and open the <code>.pdx</code> in the Playdate Simulator.
+    Every project is open source under its repo's own license.
+  </footer>
+</div>
+
+<script>
+const ORG = "https://github.com/plaidate";
+// [name, description, hasReleases]
+const SECTIONS = [
+  ["Original games", "Standalone titles, each its own crank-native design.", [
+    ["anenemy","Sea-anemone territorial warfare: engorge your venom acrorhagi and lash the rival clone off the rock.",1],
+    ["squirl","Squirrel metroidvania parkour — six squirrels, 31 rooms, magic-acorn form swaps.",1],
+    ["molt","Arkanoidvania: 28 rooms, 6 zones, 7 bosses, and five molts to earn.",1],
+    ["binnight","Tag-team trash heist — raccoon, ibis, and alley cat vs the dawn garbage truck.",1],
+    ["peckish","Top-down killdeer tideline forager: work the wet band, crank the broken-wing lure, raise the flock.",1],
+    ["nectarrush","Territorial hummingbird feeder defense: crank to sip from a nectar pool everyone is draining.",1],
+    ["clamjumper","Ocean-bed take on the 1982 arcade Claim Jumper — sea star, octopus, or ray racing a rival for the reef's pearls.",1],
+    ["weaselwardance","Mustelid rhythm game: eight weasels, small to large, dancing to a step-sequencer beat.",1],
+    ["whine","Blood and Whine — a mosquito-lifecycle game: breed on nectar and blood, court in harmonic beats.",1],
+    ["chitin","Fightin' Chitin — a 1-bit insect fighting game with a crank-driven Frenzy super.",0],
+    ["archer","Archer's Zoomie Circuit — a whippet obstacle-course racer: crank to wind up, release the zoomies.",1],
+    ["roost","A 1-bit aerial arcade game: flap, clash, and collect the eggs.",1],
+    ["fairway","A top-down golf game: 18 procedural holes, scrolling course, mini-map, stippled terrain.",1],
+    ["bauble","A 1-bit bubble shooter: crank to aim, pop clusters, beat the ceiling.",1],
+    ["bearing","A tilt-controlled marble maze — accelerometer, not crank.",1],
+  ]],
+  ["Ports", "Faithful re-implementations of games from elsewhere.", [
+    ["basilevs","A bullet-hell shoot-em-up — a C/raylib-pd port of bredlej's Basilevs (MIT). Arcade dodge-and-shoot.",0],
+  ]],
+  ["Engines &amp; collections", "Shared cores, each hosting a whole suite of games.", [
+    ["phosphor","16 original vector-graphics arcade games on a shared vec/ library — Asteroids, Tempest, Geometry Wars, Elite and more.",1],
+    ["classics","Both Code the Classics volumes, re-implemented on a shared core.",1],
+    ["tiles","Original NES/GB-style tile games on a shared 16px scrolling tile engine.",1],
+    ["dither","Original 1-bit 2D pixel/sprite games on a shared core.",1],
+    ["shmup","A generic shoot-em-up engine — vertical, horizontal, and Uridium-style scrolling.",1],
+    ["voxel","Original 1-bit 3D voxel games and a Voxatron-style engine.",1],
+    ["raylib-pd","A raylib fork with a Playdate backend — software renderer dithered to 1-bit, plus Lua bindings.",0],
+    ["raylib-games-pd","A collection of raylib sample games running on the Playdate.",0],
+  ]],
+  ["Tools &amp; modules", "Building blocks, not games.", [
+    ["crankcase","A raylib/raygui Playdate IDE — code editor, 1-bit paint, tilemap editor, MIDI piano-roll, .fnt and sfxr editors.",0],
+    ["midiplayer","A MIDI playback module: GM-lite patch bank, track mapper, and SMF generator.",0],
+  ]],
+];
+
+let total = 0;
+const host = document.getElementById("sections");
+for (const [title, sub, items] of SECTIONS){
+  total += items.length;
+  const sec = document.createElement("section");
+  const h = document.createElement("h2"); h.className = "mono";
+  h.innerHTML = title + ' <span class="n">' + items.length + '</span>';
+  const p = document.createElement("p"); p.className = "sub"; p.textContent = sub;
+  const grid = document.createElement("div"); grid.className = "grid";
+  for (const [name, desc, rel] of items){
+    const repo = ORG + "/" + name;
+    const card = document.createElement("article"); card.className = "card";
+    const img = new Image(); img.className = "cover"; img.loading = "lazy"; img.alt = name + " cover";
+    img.src = "https://raw.githubusercontent.com/plaidate/"+name+"/main/itch/cover.png";
+    img.onerror = () => img.remove();
+    const get = rel ? '<a class="chip2 get" href="'+repo+'/releases/latest">↓ Get it</a>' : '';
+    const body = document.createElement("div"); body.className = "body";
+    body.innerHTML =
+      '<a class="name" href="'+repo+'">'+name+'</a>'+
+      '<div class="desc">'+desc+'</div>'+
+      '<div class="links"><a class="chip2" href="'+repo+'">Source</a>'+get+'</div>';
+    card.appendChild(img); card.appendChild(body); grid.appendChild(card);
+  }
+  sec.appendChild(h); sec.appendChild(p); sec.appendChild(grid);
+  host.appendChild(sec);
+}
+document.getElementById("count").textContent = total + " repos";
+</script>
+</body>
+</html>
