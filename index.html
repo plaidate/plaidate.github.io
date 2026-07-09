@@ -177,7 +177,7 @@ for (const [title, sub, items] of SECTIONS){
   h.innerHTML = title + ' <span class="n">' + items.length + '</span>';
   const p = document.createElement("p"); p.className = "sub"; p.textContent = sub;
   const grid = document.createElement("div"); grid.className = "grid";
-  for (const [name, desc, rel] of items){
+  for (const [name, desc, rel] of [...items].sort((a,b)=>a[0].localeCompare(b[0]))){
     const repo = ORG + "/" + name;
     const card = document.createElement("article"); card.className = "card";
     const img = new Image(); img.className = "cover"; img.loading = "lazy"; img.alt = name + " cover";
