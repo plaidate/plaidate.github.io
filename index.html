@@ -159,8 +159,8 @@ const SECTIONS = [
     ["dither","Original 1-bit 2D pixel/sprite games on a shared core.",1],
     ["shmup","A generic shoot-em-up engine — vertical, horizontal, and Uridium-style scrolling.",1],
     ["voxel","Original 1-bit 3D voxel games and a Voxatron-style engine.",1],
-    ["raylib-pd","A raylib fork with a Playdate backend — software renderer dithered to 1-bit, plus Lua bindings.",0],
-    ["raylib-games-pd","A collection of raylib sample games running on the Playdate.",0],
+    ["raylib-pd","A raylib fork with a Playdate backend — software renderer dithered to 1-bit, plus Lua bindings.",0,{branch:"playdate"}],
+    ["raylib-games-pd","A collection of raylib sample games running on the Playdate.",0,{branch:"playdate",cover:"cover.gif"}],
   ]],
   ["Tools &amp; modules", "Building blocks, not games.", [
     ["crankcase","A raylib/raygui Playdate IDE — code editor, 1-bit paint, tilemap editor, MIDI piano-roll, .fnt and sfxr editors.",0],
@@ -177,11 +177,12 @@ for (const [title, sub, items] of SECTIONS){
   h.innerHTML = title + ' <span class="n">' + items.length + '</span>';
   const p = document.createElement("p"); p.className = "sub"; p.textContent = sub;
   const grid = document.createElement("div"); grid.className = "grid";
-  for (const [name, desc, rel] of [...items].sort((a,b)=>a[0].localeCompare(b[0]))){
+  for (const [name, desc, rel, opts={}] of [...items].sort((a,b)=>a[0].localeCompare(b[0]))){
     const repo = ORG + "/" + name;
+    const branch = opts.branch || "main", cover = opts.cover || "cover.png";
     const card = document.createElement("article"); card.className = "card";
     const img = new Image(); img.className = "cover"; img.loading = "lazy"; img.alt = name + " cover";
-    img.src = "https://raw.githubusercontent.com/plaidate/"+name+"/main/itch/cover.png";
+    img.src = "https://raw.githubusercontent.com/plaidate/"+name+"/"+branch+"/itch/"+cover;
     img.onerror = () => img.remove();
     const get = rel ? '<a class="chip2 get" href="'+repo+'/releases/latest">↓ Get it</a>' : '';
     const body = document.createElement("div"); body.className = "body";
