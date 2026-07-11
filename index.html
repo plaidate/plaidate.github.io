@@ -114,6 +114,7 @@
     <nav class="meta mono">
       <span class="chip count" id="count">26 repos</span>
       <a class="chip" href="https://github.com/plaidate">GitHub org →</a>
+      <a class="chip" href="https://plaidate.github.io/playdate-book/">The book →</a>
       <a class="chip" href="https://play.date/account/sideload/">How to sideload →</a>
     </nav>
   </header>
@@ -166,6 +167,11 @@ const SECTIONS = [
     ["crankcase","A raylib/raygui Playdate IDE — code editor, 1-bit paint, tilemap editor, MIDI piano-roll, .fnt and sfxr editors.",0],
     ["midiplayer","A MIDI playback module: GM-lite patch bank, track mapper, and SMF generator.",0],
   ]],
+  ["The book", "How all of this gets built — read it free, online or as a PDF.", [
+    ["playdate-book","Playdate Game Development in Lua — six parts, twenty chapters, five appendices. Every chapter has a runnable example, and every figure was captured live from it in the Simulator.",0,
+      {url:"https://plaidate.github.io/playdate-book/",
+       pdf:"https://plaidate.github.io/playdate-book/Playdate-Game-Development-in-Lua.pdf"}],
+  ]],
 ];
 
 let total = 0;
@@ -184,12 +190,15 @@ for (const [title, sub, items] of SECTIONS){
     const img = new Image(); img.className = "cover"; img.loading = "lazy"; img.alt = name + " cover";
     img.src = "https://raw.githubusercontent.com/plaidate/"+name+"/"+branch+"/itch/"+cover;
     img.onerror = () => img.remove();
-    const get = rel ? '<a class="chip2 get" href="'+repo+'/releases/latest">↓ Get it</a>' : '';
+    const home = opts.url || repo;
+    const read = opts.url ? '<a class="chip2" href="'+opts.url+'">Read</a>' : '';
+    const get = rel ? '<a class="chip2 get" href="'+repo+'/releases/latest">↓ Get it</a>'
+      : (opts.pdf ? '<a class="chip2 get" href="'+opts.pdf+'">↓ PDF</a>' : '');
     const body = document.createElement("div"); body.className = "body";
     body.innerHTML =
-      '<a class="name" href="'+repo+'">'+name+'</a>'+
+      '<a class="name" href="'+home+'">'+name+'</a>'+
       '<div class="desc">'+desc+'</div>'+
-      '<div class="links"><a class="chip2" href="'+repo+'">Source</a>'+get+'</div>';
+      '<div class="links">'+read+'<a class="chip2" href="'+repo+'">Source</a>'+get+'</div>';
     card.appendChild(img); card.appendChild(body); grid.appendChild(card);
   }
   sec.appendChild(h); sec.appendChild(p); sec.appendChild(grid);
